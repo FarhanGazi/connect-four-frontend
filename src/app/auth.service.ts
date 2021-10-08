@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { throwError } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -41,6 +42,23 @@ export class AuthService {
         localStorage.setItem('connectfour_token', this.token);
       })
     );
+  }
+
+  public signup(params: any = {}): Observable<any> {
+    const options = {
+      headers: new HttpHeaders({
+        'cache-control': 'no-cache',
+        'Content-Type': 'application/json'
+      })
+    };
+
+    return this.http.post(`${this.url}/auth/signin`, params, options).pipe(
+      tap((data) => {
+        console.log(data);
+      }),
+      catchError((error: HttpErrorResponse) => { return throwError('Something bad happened; please try again later.'); })
+    )
+
   }
 
   get_token() {
